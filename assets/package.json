@@ -1,0 +1,35 @@
+{
+  "repository": {},
+  "description": " ",
+  "license": "MIT",
+  "scripts": {
+    "update": "pnpm up --latest --interactive"
+  },
+  "engines": {
+    "node": "^24.0.0",
+    "npm": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.2.0",
+    "@types/phoenix": "^1.6.5",
+    "@types/phoenix_live_view": "^1.0.0",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "typescript": "^5.2.2"
+  },
+  "prettier": {
+    "endOfLine": "lf",
+    "jsxBracketSameLine": true,
+    "printWidth": 120,
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "arrowParens": "avoid"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "topbar": "^3.0.0"
+  }
+}
