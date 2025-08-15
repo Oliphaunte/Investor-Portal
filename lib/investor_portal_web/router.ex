@@ -17,12 +17,6 @@ defmodule InvestorPortalWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", InvestorPortalWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-  end
-
   # Other scopes may use custom stacks.
   # scope "/api", InvestorPortalWeb do
   #   pipe_through :api
@@ -64,6 +58,7 @@ defmodule InvestorPortalWeb.Router do
 
     live_session :current_user,
       on_mount: [{InvestorPortalWeb.UserAuth, :mount_current_scope}] do
+      live "/", LandingLive
       live "/users/register", UserLive.Registration, :new
       live "/users/log-in", UserLive.Login, :new
       live "/users/log-in/:token", UserLive.Confirmation, :new
