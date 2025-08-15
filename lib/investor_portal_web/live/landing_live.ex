@@ -21,14 +21,22 @@ defmodule InvestorPortalWeb.LandingLive do
               Stay organized with streamlined onboarding and real-time updates.
             </p>
 
-            <div class="mt-6 flex justify-center gap-3">
-              <.button variant="primary" navigate={~p"/users/register"}>
-                Get Started
-              </.button>
-              <.button navigate={~p"/users/log-in"}>
-                Log in
-              </.button>
-            </div>
+            <%= if @current_scope do %>
+              <div class="mt-6 flex justify-center">
+                <.button variant="primary" navigate={~p"/admin"}>
+                  Open Admin
+                </.button>
+              </div>
+            <% else %>
+              <div class="mt-6 flex justify-center gap-3">
+                <.button variant="primary" navigate={~p"/users/register"}>
+                  Get Started
+                </.button>
+                <.button navigate={~p"/users/log-in"}>
+                  Log in
+                </.button>
+              </div>
+            <% end %>
           </div>
         </section>
 

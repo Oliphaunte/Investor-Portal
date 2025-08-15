@@ -14,6 +14,9 @@ defmodule InvestorPortalWeb.Components.Header do
             {@current_scope.user.email}
           </li>
           <li>
+            <.link href={~p"/admin"}>Admin</.link>
+          </li>
+          <li>
             <.link href={~p"/users/log-out"} method="delete">Log out</.link>
           </li>
         <% else %>
