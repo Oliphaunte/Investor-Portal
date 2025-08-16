@@ -17,6 +17,20 @@ defmodule InvestorPortalWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :graphql do
+    plug :accepts, ["json"]
+    plug :fetch_session
+    plug :fetch_current_scope_for_user
+    plug :protect_from_forgery
+    plug InvestorPortalWeb.AbsintheContext
+  end
+
+  scope "/api" do
+    pipe_through :graphql
+
+    forward "/graphql", Absinthe.Plug, schema: InvestorPortal.API
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", InvestorPortalWeb do
   #   pipe_through :api
