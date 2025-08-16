@@ -3,6 +3,7 @@ defmodule InvestorPortal.Api.Resolvers.Investors do
 
   alias InvestorPortal.Investors
 
+  @doc false
   def create_investor(_parent, %{input: input}, %{context: %{current_user: user}})
       when not is_nil(user) do
     attrs = Map.put(input, :user_id, user.id)
