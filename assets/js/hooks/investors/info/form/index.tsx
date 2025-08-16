@@ -183,6 +183,7 @@ export default ({ csrfToken, onCreated, onOpenUpload, investorId }: Props) => {
 
   const onDeleteUpload = async () => {
     if (!investorId) return
+    if (submitting) return
     const confirmed = window.confirm('Remove the uploaded file?')
     if (!confirmed) return
     setSubmitting(true)
@@ -190,8 +191,8 @@ export default ({ csrfToken, onCreated, onOpenUpload, investorId }: Props) => {
     try {
       const res = await fetch(`/api/investor_data/${investorId}/uploads`, {
         method: 'DELETE',
+        credentials: 'same-origin',
         headers: {
-          'content-type': 'application/json',
           'x-csrf-token': csrfToken,
         },
       })
