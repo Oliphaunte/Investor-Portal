@@ -1,4 +1,4 @@
-import InvestorInfo from './investors/index'
+import InvestorInfo from './investors/info/index'
 
 export default {
   InvestorInfo,

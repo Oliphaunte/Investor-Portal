@@ -58,6 +58,14 @@ defmodule InvestorPortalWeb.AdminLive do
   end
 
   @impl true
+  def handle_event("investor_created", %{"id" => _id}, socket) do
+    {:noreply,
+     socket
+     |> assign(investor_datas: Investors.list_by(user_id: socket.assigns.current_scope.user.id))
+     |> put_flash(:info, "Investor created successfully")}
+  end
+
+  @impl true
   def handle_event("edit", %{"id" => _id}, socket) do
     {:noreply, socket}
   end
