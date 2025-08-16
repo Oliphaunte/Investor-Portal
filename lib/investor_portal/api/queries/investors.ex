@@ -1,6 +1,7 @@
 defmodule InvestorPortal.Api.Queries.Investors do
   use Absinthe.Schema.Notation
 
+  alias InvestorPortal.Api.Middlewares.Authenticator
   alias InvestorPortal.Api.Resolvers
 
   object :investor_queries do

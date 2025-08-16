@@ -6,7 +6,50 @@ defmodule InvestorPortalWeb.AdminLive do
   def mount(_params, _session, socket) do
     investor_datas = Investors.list_by(user_id: socket.assigns.current_scope.user.id)
 
-    {:ok, socket |> assign(investor_datas: investor_datas)}
+    if connected?(socket) do
+      Phoenix.PubSub.subscribe(InvestorPortal.PubSub, "investor_data")
+    end
+
+    {:ok,
+     socket
+     |> assign(step: :info)
+     |> assign(current_investor: nil)
+     |> assign(investor_datas: investor_datas)}
+  end
+
+  @impl true
+  def handle_info({:investor_updated, investor}, socket) do
+    list = Investors.list_by(user_id: socket.assigns.current_scope.user.id)
+
+    socket =
+      if socket.assigns.current_investor && socket.assigns.current_investor.id == investor.id do
+        socket
+        |> assign(investor_datas: list)
+        |> assign(current_investor: investor)
+        |> put_flash(:info, "Investor updated successfully")
+      else
+        socket |> assign(investor_datas: list)
+      end
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:investor_deleted, investor}, socket) do
+    list = Investors.list_by(user_id: socket.assigns.current_scope.user.id)
+
+    socket =
+      if socket.assigns.current_investor && socket.assigns.current_investor.id == investor.id do
+        socket
+        |> assign(step: :info)
+        |> assign(investor_datas: list)
+        |> assign(current_investor: nil)
+        |> put_flash(:info, "Investor deleted successfully")
+      else
+        socket |> assign(investor_datas: list)
+      end
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -44,8 +87,11 @@ defmodule InvestorPortalWeb.AdminLive do
 
       <div class="max-w-2xl mx-auto py-8">
         <div
+          :if={@step == :info}
           id="investor-info-root"
           phx-hook="InvestorInfo"
+          phx-update="ignore"
+          data-investor-id={@current_investor && @current_investor.id}
         />
       </div>
     </Layouts.app>
@@ -54,19 +100,20 @@ defmodule InvestorPortalWeb.AdminLive do
 
   @impl true
   def handle_event("new", _params, socket) do
-    {:noreply, socket}
+    {:noreply, socket |> assign(step: :info) |> assign(current_investor: nil)}
   end
 
   @impl true
-  def handle_event("investor_created", %{"id" => _id}, socket) do
+  def handle_event("investor_created", %{"id" => id}, socket) do
     {:noreply,
      socket
      |> assign(investor_datas: Investors.list_by(user_id: socket.assigns.current_scope.user.id))
+     |> assign(current_investor: Investors.get(id))
      |> put_flash(:info, "Investor created successfully")}
   end
 
   @impl true
-  def handle_event("edit", %{"id" => _id}, socket) do
-    {:noreply, socket}
+  def handle_event("edit", %{"id" => id}, socket) do
+    {:noreply, socket |> assign(step: :info) |> assign(current_investor: Investors.get(id))}
   end
 end

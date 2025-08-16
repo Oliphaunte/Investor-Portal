@@ -62,7 +62,7 @@ export default ({ csrfToken, onCreated, onOpenUpload, investorId }: Props) => {
 
       try {
         setError(null)
-        const query = `query($id: ID!){ get_investor_data(id: $id){ id first_name last_name phone address state zip uploads } }`
+        const query = `query($id: ID!){ get_investor(id: $id){ id first_name last_name phone address state zip uploads } }`
         const res = await fetch('/api/graphql', {
           method: 'POST',
           headers: {
@@ -77,7 +77,7 @@ export default ({ csrfToken, onCreated, onOpenUpload, investorId }: Props) => {
           const msg = data.errors?.map((e: any) => e.message).join(', ') || 'Request failed'
           throw new Error(msg)
         }
-        const inv = data.data?.get_investor_data || {}
+        const inv = data.data?.get_investor || {}
 
         reset({
           first_name: inv.first_name || '',
@@ -150,6 +150,37 @@ export default ({ csrfToken, onCreated, onOpenUpload, investorId }: Props) => {
     }
   })
 
+  const onDelete = async () => {
+    if (!investorId) return
+    const confirmed = window.confirm('Are you sure you want to delete this investor? This action cannot be undone.')
+    if (!confirmed) return
+    setSubmitting(true)
+    setError(null)
+    try {
+      const query = `mutation($id: ID!) { delete_investor(id: $id) }`
+      const res = await fetch('/api/graphql', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-csrf-token': csrfToken,
+        },
+        body: JSON.stringify({ query, variables: { id: investorId } }),
+      })
+      const data = await res.json()
+      if (!res.ok || data.errors) {
+        const msg = data.errors?.map((e: any) => e.message).join(', ') || 'Request failed'
+        throw new Error(msg)
+      }
+      const ok = data.data?.delete_investor === true
+      if (!ok) throw new Error('Delete failed')
+      reset({ first_name: '', last_name: '', phone: '', address: '', state: '', zip: '' })
+    } catch (err: any) {
+      setError(err.message || 'Network error')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
     <form onSubmit={submit} className="space-y-4">
       {error && <div className="alert alert-error">{error}</div>}
@@ -216,6 +247,12 @@ export default ({ csrfToken, onCreated, onOpenUpload, investorId }: Props) => {
         <button className="btn btn-primary" type="submit" disabled={submitting}>
           {submitting ? 'Saving...' : 'Save'}
         </button>
+
+        {investorId && (
+          <button type="button" className="btn btn-error" onClick={onDelete} disabled={submitting}>
+            {submitting ? 'Deleting...' : 'Delete'}
+          </button>
+        )}
       </div>
     </form>
   )
