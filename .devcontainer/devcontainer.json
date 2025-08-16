@@ -1,0 +1,22 @@
+{
+  "name": "InvestorPortal Dev",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [4000, 5432],
+  "postCreateCommand": "mix local.hex --force && mix local.rebar --force && mix setup",
+  "postStartCommand": "sh -lc 'mix phx.server >/workspace/phx.log 2>&1 &'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "elixir-lsp.elixir-ls",
+        "bradlc.vscode-tailwindcss",
+        "ms-azuretools.vscode-docker",
+        "GraphQL.vscode-graphql"
+      ],
+      "settings": {
+        "elixirLS.signatureAfterComplete": true
+      }
+    }
+  }
+}
