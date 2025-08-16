@@ -93,9 +93,32 @@ defmodule InvestorPortalWeb.AdminLive do
           phx-update="ignore"
           data-investor-id={@current_investor && @current_investor.id}
         />
+
+        <div :if={@step == :upload && @current_investor} class="space-y-4">
+          <p class="text-base-content/70">
+            Upload your files for {@current_investor.first_name} {@current_investor.last_name}.
+          </p>
+          <div
+            id="upload-root"
+            phx-hook="InvestorUpload"
+            phx-update="ignore"
+            data-investor-id={@current_investor && @current_investor.id}
+            data-upload-base-url="/api/investor_data"
+          />
+        </div>
       </div>
     </Layouts.app>
     """
+  end
+
+  @impl true
+  def handle_event("investor_created", %{"id" => id}, socket) do
+    {:noreply,
+     socket
+     |> assign(step: :upload)
+     |> assign(investor_datas: Investors.list_by(user_id: socket.assigns.current_scope.user.id))
+     |> assign(current_investor: Investors.get(id))
+     |> put_flash(:info, "Investor created successfully")}
   end
 
   @impl true
@@ -104,12 +127,8 @@ defmodule InvestorPortalWeb.AdminLive do
   end
 
   @impl true
-  def handle_event("investor_created", %{"id" => id}, socket) do
-    {:noreply,
-     socket
-     |> assign(investor_datas: Investors.list_by(user_id: socket.assigns.current_scope.user.id))
-     |> assign(current_investor: Investors.get(id))
-     |> put_flash(:info, "Investor created successfully")}
+  def handle_event("upload", %{"id" => id}, socket) do
+    {:noreply, socket |> assign(step: :upload) |> assign(current_investor: Investors.get(id))}
   end
 
   @impl true

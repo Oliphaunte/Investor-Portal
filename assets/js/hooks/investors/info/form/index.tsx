@@ -181,6 +181,33 @@ export default ({ csrfToken, onCreated, onOpenUpload, investorId }: Props) => {
     }
   }
 
+  const onDeleteUpload = async () => {
+    if (!investorId) return
+    const confirmed = window.confirm('Remove the uploaded file?')
+    if (!confirmed) return
+    setSubmitting(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/investor_data/${investorId}/uploads`, {
+        method: 'DELETE',
+        headers: {
+          'content-type': 'application/json',
+          'x-csrf-token': csrfToken,
+        },
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        const msg = (data && data.error) || 'Delete failed'
+        throw new Error(msg)
+      }
+      setUploadsUrl(null)
+    } catch (err: any) {
+      setError(err.message || 'Network error')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
     <form onSubmit={submit} className="space-y-4">
       {error && <div className="alert alert-error">{error}</div>}
@@ -244,6 +271,26 @@ export default ({ csrfToken, onCreated, onOpenUpload, investorId }: Props) => {
       </div>
 
       <div className="flex items-center gap-3">
+        {investorId &&
+          (uploadsUrl ? (
+            <>
+              <a className="btn" href={uploadsUrl} target="_blank" rel="noreferrer">
+                Download
+              </a>
+              <button type="button" className="btn btn-warning" onClick={onDeleteUpload} disabled={submitting}>
+                {submitting ? 'Deleting Upload...' : 'Delete Upload'}
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => investorId && onOpenUpload && onOpenUpload(investorId)}
+              disabled={submitting}>
+              Create Upload
+            </button>
+          ))}
+
         <button className="btn btn-primary" type="submit" disabled={submitting}>
           {submitting ? 'Saving...' : 'Save'}
         </button>

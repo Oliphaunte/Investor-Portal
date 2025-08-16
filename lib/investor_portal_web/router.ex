@@ -25,10 +25,24 @@ defmodule InvestorPortalWeb.Router do
     plug InvestorPortalWeb.AbsintheContext
   end
 
+  pipeline :api_auth do
+    plug :fetch_session
+    plug :fetch_current_scope_for_user
+    plug :protect_from_forgery
+  end
+
   scope "/api" do
     pipe_through :graphql
 
     forward "/graphql", Absinthe.Plug, schema: InvestorPortal.API
+  end
+
+  # REST
+  scope "/api", InvestorPortalWeb do
+    pipe_through [:api_auth, :require_authenticated_user]
+
+    post "/investor_data/:id/uploads", UploadController, :create
+    delete "/investor_data/:id/uploads", UploadController, :delete
   end
 
   # Other scopes may use custom stacks.
