@@ -42,5 +42,9 @@ defmodule InvestorPortal.Investor do
       :zip,
       :user_id
     ])
+    |> unique_constraint(:first_name,
+      name: :investor_data_first_name_last_name_user_id_index,
+      message: "An investor with this first name and last name already exists for your account."
+    )
   end
 end
