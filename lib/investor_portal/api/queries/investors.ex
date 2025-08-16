@@ -8,6 +8,7 @@ defmodule InvestorPortal.Api.Queries.Investors do
     field :get_investor, non_null(:investor) do
       arg(:id, non_null(:id))
 
+      middleware(Authenticator)
       resolve(&Resolvers.Investors.get_investor/3)
     end
   end
